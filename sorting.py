@@ -34,7 +34,18 @@ def insertionSort(toSort):
 	return toSort
 
 
-print(insertionSort([3, 4, 2, 1, 6, 5]))
+def selectionSort(toSort):
+	for i in range (0,(len(toSort)-1)):
+		print (i)
+		min = i
+		for j in range(i+1,len(toSort)):
+			if toSort[j] < toSort[min]:
+				min = j
+		toSort[i], toSort[min] = toSort[min], toSort[i]
+	return toSort
+
+
+print(selectionSort([3, 4, 2, 1, 6, 5]))
 
 
 
