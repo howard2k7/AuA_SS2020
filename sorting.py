@@ -31,7 +31,6 @@ def insertionSort(toSort):
 
 	# Messy but works, could be 1 add Register lockup faster then the not messy Version
 	for i in range(1,len(toSort)):
-		print(toSort)
 		value = toSort[i]
 		for j in range(i-1, -1, -1):
 			if value < toSort[j]:

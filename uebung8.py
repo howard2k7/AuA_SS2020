@@ -38,9 +38,7 @@ def goldenSectionFAP(func, interval):
 	mry = 0.0
 
 	while (right - left) > 0.0001:
-
 		a = (right - left) * phiPercent
-
 		mlx = left + a
 		mrx = right - a
 
@@ -48,8 +46,6 @@ def goldenSectionFAP(func, interval):
 			mly = func(mlx)
 		if mry == 0.0:
 			mry = func(mrx)
-
-		# print("a " + str(a) + " ml " + str(mly) + " mr " + str(mry))
 
 		if mly < mry:
 			right = mrx
@@ -61,8 +57,6 @@ def goldenSectionFAP(func, interval):
 			mly = mry
 			mry = 0.0
 
-	# 	print(str(right - left))
-
 	printSomethingUseful(func, interval, (mrx - (0.5*(mrx-mlx)), mry - (0.5*(-mly))))
 
 	return
@@ -70,8 +64,8 @@ def goldenSectionFAP(func, interval):
 
 if __name__ == "__main__":
 	# Which function shall be used, which interval shall be checked?
-	funcToUse = unimodal1_1
-	position = (-1, 1)
+	funcToUse = unimodal3_3
+	position = (-3, 3)
 
 	# Do it!
 	goldenSectionFAP(funcToUse, position)
