@@ -3,24 +3,27 @@ import time
 import numpy as np
 import matplotlib.pyplot as mp
 from copy import deepcopy
+import concurrent.futures
 
-def printResults(times):
+def printResults(times, sortieralgorithmen, plotart):
+	"""
+	Generates a graphical visualization of the runtimes {times} needed
+	by the algorithms {sortieralgorithmen} using a defined plot type {plotart}
+	"""
 	colors = ["green", "red", "cyan", "magenta", "black", "blue"]
-	fig = mp.figure()
-	ax = fig.add_subplot(1, 1, 1)
-
-	if len(times) > len(colors):
-		return -1
-	else:
-		for x in times:
-			x_values = []
-			y_values = []
-			for c in x:
-				x_values.append(c[0])
-				y_values.append(c[1])
-			ax.loglog(x_values, y_values)
-			ax.set_color = colors.pop()
-		mp.show()
+	lbls = []
+	for lbl in sortieralgorithmen:
+		lbls.append(lbl.__name__)
+	myPlots = []
+	for x in times:
+		x_values = []
+		y_values = []
+		for i in x:
+			x_values.append(i[0])
+			y_values.append(i[1])
+		myPlots.append(plotart(x_values, y_values, color = colors.pop()))
+	mp.legend(lbls)
+	mp.show()
 
 def testListsGenerator(listCount: int, maxLength: int, lowhigh:int ):
 	"""
@@ -28,7 +31,6 @@ def testListsGenerator(listCount: int, maxLength: int, lowhigh:int ):
 	maxLength = Maximum length of last list
 
 	The lenght of each list will be equally spaced from 3 items to maxLength
-
 	"""
 
 	generatedLists = []
@@ -44,13 +46,14 @@ def testListsGenerator(listCount: int, maxLength: int, lowhigh:int ):
 		return generatedLists
 
 def SortTest(algorithm, toSort):
-
+	"""
+	Sorts the lists in {toSort} with all algorithm functions in {algorithm}
+	"""
 	times = []
 	for x in algorithm:
 		algTime = []
 		for c in toSort :
 			start = time.perf_counter()
-	#		sortedArr.append(sa.bubbleSort(c))
 			c = x(deepcopy(c))
 			end = time.perf_counter()
 			algTime.append((len(c),(end-start)))
@@ -58,15 +61,53 @@ def SortTest(algorithm, toSort):
 	return times
 
 
+def SingleSortTest(args):
+	"""
+	Helper function for multiprocessor sorting
+	{args}: [0] function used for sorting
+			[1] list of unsorted lists
+	"""
+	algTime = []
+	for c in args[1] :
+		start = time.perf_counter()
+		c = args[0](c)
+		end = time.perf_counter()
+		algTime.append((len(c),(end-start)))
+	return algTime
 
+def SortMultiCPU(algorithm, toSort):
+	"""
+	Sorts the lists in {toSort} with all algorithm functions in {algorithm}, but with multiple CPUs
+	"""
+	args = [(x,deepcopy(toSort)) for x in algorithm]
+	with concurrent.futures.ProcessPoolExecutor() as executor:
+		runtimes = executor.map(SingleSortTest, args)
+
+	return list(runtimes)
 
 
 if __name__ == "__main__":
 	sortTime = []
-	toSort = testListsGenerator(30, 1000, (0,100))
-	sortTime = SortTest([sa.bubbleSort, sa.insertionSort, sa.selectionSort], toSort)
+	"""
+	Setup:	
+	__________________________________________________________________________
+	"""
+	sortieralgorithmen = [sa.bubbleSort, sa.insertionSort, sa.selectionSort]
+	plotart = mp.loglog
+	anzahlListen = 30
+	maximaleListenlaenge = 10000
+	wertebereich = (0, 100)
 
-	printResults(sortTime)
+	"""_______________________________________________________________________
+	"""
+
+	begin = time.perf_counter()
+	toSort = testListsGenerator(anzahlListen, maximaleListenlaenge, wertebereich)
+	#sortTime = SortMultiCPU(sortieralgorithmen,toSort)
+	sortTime = SortTest(sortieralgorithmen, toSort)
+	printResults(sortTime, sortieralgorithmen, plotart)
+	end = time.perf_counter()
+	print(f'Programmausführung in {end-begin}')
 
 
 
