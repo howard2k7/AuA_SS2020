@@ -59,7 +59,6 @@ def selectionSort(toSort):
 		toSort[i], toSort[min] = toSort[min], toSort[i]
 	return toSort
 
-
 if __name__ == "__main__":
 	print(bubbleSort([3, 4, 2, 1, 6, 5]))
 

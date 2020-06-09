@@ -11,6 +11,8 @@ def printResults(times, sortieralgorithmen, plotart):
 	by the algorithms {sortieralgorithmen} using a defined plot type {plotart}
 	"""
 	colors = ["green", "red", "cyan", "magenta", "black", "blue"]
+	if len(times) > len(colors):
+		return -1
 	lbls = []
 	for lbl in sortieralgorithmen:
 		lbls.append(lbl.__name__)
@@ -75,6 +77,7 @@ def SingleSortTest(args):
 		algTime.append((len(c),(end-start)))
 	return algTime
 
+
 def SortMultiCPU(algorithm, toSort):
 	"""
 	Sorts the lists in {toSort} with all algorithm functions in {algorithm}, but with multiple CPUs
@@ -94,18 +97,23 @@ if __name__ == "__main__":
 	"""
 	sortieralgorithmen = [sa.bubbleSort, sa.insertionSort, sa.selectionSort]
 	plotart = mp.loglog
-	anzahlListen = 30
-	maximaleListenlaenge = 10000
+	anzahlListen = 1000
+	maximaleListenlaenge = 1000
 	wertebereich = (0, 100)
-
+	multiprocessor = 1
 	"""_______________________________________________________________________
 	"""
 
 	begin = time.perf_counter()
 	toSort = testListsGenerator(anzahlListen, maximaleListenlaenge, wertebereich)
-	#sortTime = SortMultiCPU(sortieralgorithmen,toSort)
-	sortTime = SortTest(sortieralgorithmen, toSort)
+
+	if multiprocessor == 0:
+		sortTime = SortTest(sortieralgorithmen, toSort)
+	else:
+		sortTime = SortMultiCPU(sortieralgorithmen,toSort)
+
 	printResults(sortTime, sortieralgorithmen, plotart)
+
 	end = time.perf_counter()
 	print(f'Programmausführung in {end-begin}')
 
